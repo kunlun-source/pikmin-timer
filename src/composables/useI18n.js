@@ -1,7 +1,8 @@
-import { ref, computed } from 'vue'
+import { ref, watch } from 'vue'
 
 const messages = {
   'zh-TW': {
+    metaTitle: '蘑菇重生計時器',
     title: '🍄 蘑菇重生計時器',
     invalidFormat: '格式錯誤（分 > 59 或秒 > 59）',
     placeholder: '剩餘時間（如 530 = 5分30秒）',
@@ -18,6 +19,7 @@ const messages = {
     undo: '復原',
   },
   en: {
+    metaTitle: 'Mushroom Respawn Timer',
     title: '🍄 Mushroom Respawn Timer',
     invalidFormat: 'Invalid (min > 59 or sec > 59)',
     placeholder: 'Time left (e.g. 530 = 5m30s)',
@@ -43,6 +45,12 @@ function detectLocale() {
 }
 
 const locale = ref(detectLocale())
+
+function updateDocTitle() {
+  document.title = messages[locale.value]?.metaTitle ?? messages['zh-TW'].metaTitle
+}
+updateDocTitle()
+watch(locale, updateDocTitle)
 
 function t(key, params) {
   let str = messages[locale.value]?.[key] ?? messages['zh-TW'][key] ?? key

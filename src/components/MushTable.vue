@@ -173,7 +173,7 @@ const sortedItems = computed(() => {
 }
 
 .input-spacer {
-  width: 40px;
+  width: 72px;
   flex-shrink: 0;
 }
 

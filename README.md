@@ -2,6 +2,8 @@
 
 [Pikmin Bloom](https://pikminbloom.com/) 蘑菇重生計時器，幫助你追蹤蘑菇的重生時間。
 
+**線上使用：** https://kunlun-source.github.io/pikmin-timer/
+
 ## 功能
 
 - 輸入蘑菇剩餘時間，自動計算重生時刻
