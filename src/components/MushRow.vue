@@ -1,23 +1,14 @@
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { computed } from 'vue'
 import { useI18n } from '../composables/useI18n.js'
 
 const { t } = useI18n()
 
 const props = defineProps({
   item: { type: Object, required: true },
+  now: { type: Number, required: true },
 })
 const emit = defineEmits(['toggle-delete'])
-
-const now = ref(Date.now())
-let timer = null
-
-onMounted(() => {
-  timer = setInterval(() => {
-    now.value = Date.now()
-  }, 1000)
-})
-onUnmounted(() => clearInterval(timer))
 
 function formatTime(ts) {
   const d = new Date(ts)
@@ -27,7 +18,7 @@ function formatTime(ts) {
 const killLabel = computed(() => formatTime(props.item.killTs))
 const respawnLabel = computed(() => formatTime(props.item.respawnTs))
 
-const remainMs = computed(() => props.item.respawnTs - now.value)
+const remainMs = computed(() => props.item.respawnTs - props.now)
 
 const countdownLabel = computed(() => {
   const ms = remainMs.value
@@ -47,10 +38,16 @@ const countdownClass = computed(() => {
   if (ms <= 60_000) return 'warning'
   return 'normal'
 })
+
+const isExpanding = computed(() => {
+  if (props.item.deleted) return false
+  const ms = remainMs.value
+  return ms > 0 && ms <= 60_000
+})
 </script>
 
 <template>
-  <tr :class="['mush-row', countdownClass, { deleted: item.deleted }]">
+  <tr :class="['mush-row', countdownClass, { deleted: item.deleted, expanding: isExpanding }]">
     <td>{{ killLabel }}</td>
     <td>{{ respawnLabel }}</td>
     <td class="countdown" :class="countdownClass">{{ item.deleted ? '—' : countdownLabel }}</td>
@@ -71,7 +68,12 @@ const countdownClass = computed(() => {
   border-bottom: 1px solid #333;
   text-align: center;
   line-height: 1.4;
-  transition: opacity 0.3s;
+  transition: opacity 0.3s, padding 5s ease-out, font-size 5s ease-out;
+}
+
+.mush-row.expanding td {
+  padding: 30px 12px;
+  font-size: 1.4em;
 }
 
 .mush-row.deleted td {

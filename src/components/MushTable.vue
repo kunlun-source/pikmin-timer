@@ -1,11 +1,27 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import MushRow from './MushRow.vue'
 import { useStorage } from '../composables/useStorage.js'
 import { useI18n } from '../composables/useI18n.js'
 
 const { items, addItem, toggleDelete } = useStorage()
 const { t } = useI18n()
+
+// Unified clock — snaps to whole seconds so all rows update simultaneously
+const now = ref(Math.floor(Date.now() / 1000) * 1000)
+let clockTimer = null
+onMounted(() => {
+  const msToNextSec = 1000 - (Date.now() % 1000)
+  setTimeout(() => {
+    now.value = Math.floor(Date.now() / 1000) * 1000
+    clockTimer = setInterval(() => {
+      now.value = Math.floor(Date.now() / 1000) * 1000
+    }, 1000)
+  }, msToNextSec)
+})
+onUnmounted(() => clearInterval(clockTimer))
+
+const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000
 
 const rawInput = ref('')
 
@@ -39,13 +55,15 @@ function handleAdd() {
 }
 
 const sortedItems = computed(() => {
-  const now = Date.now()
-  return [...items.value].sort((a, b) => {
-    const aExpired = a.respawnTs <= now
-    const bExpired = b.respawnTs <= now
-    if (aExpired !== bExpired) return aExpired ? 1 : -1
-    return a.respawnTs - b.respawnTs
-  })
+  const n = now.value
+  return [...items.value]
+    .filter((item) => n - item.respawnTs < SEVEN_DAYS)
+    .sort((a, b) => {
+      const aExpired = a.respawnTs <= n
+      const bExpired = b.respawnTs <= n
+      if (aExpired !== bExpired) return aExpired ? 1 : -1
+      return a.respawnTs - b.respawnTs
+    })
 })
 </script>
 
@@ -89,6 +107,7 @@ const sortedItems = computed(() => {
           v-for="item in sortedItems"
           :key="item.id"
           :item="item"
+          :now="now"
           @toggle-delete="toggleDelete"
         />
       </tbody>
