@@ -26,8 +26,9 @@ const countdownLabel = computed(() => {
   const totalSec = Math.ceil(ms / 1000)
   const min = Math.floor(totalSec / 60)
   const sec = totalSec % 60
-  if (min > 0) return t('minSec', { m: min, s: sec })
-  return t('secOnly', { s: sec })
+  const secStr = String(sec).padStart(2, '0')
+  if (min > 0) return t('minSec', { m: String(min).padStart(2, '\u2007'), s: secStr })
+  return t('secOnly', { s: secStr })
 })
 
 const countdownClass = computed(() => {
@@ -85,6 +86,11 @@ const isExpanding = computed(() => {
 .mush-row.deleted td:last-child {
   text-decoration: none;
   opacity: 0.7;
+}
+
+.countdown {
+  font-variant-numeric: tabular-nums;
+  min-width: 120px;
 }
 
 .countdown.normal {

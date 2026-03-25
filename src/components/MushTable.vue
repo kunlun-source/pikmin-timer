@@ -21,7 +21,7 @@ onMounted(() => {
 })
 onUnmounted(() => clearInterval(clockTimer))
 
-const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000
+const TWO_DAYS = 2 * 24 * 60 * 60 * 1000
 
 const rawInput = ref('')
 
@@ -57,7 +57,7 @@ function handleAdd() {
 const sortedItems = computed(() => {
   const n = now.value
   return [...items.value]
-    .filter((item) => n - item.respawnTs < SEVEN_DAYS)
+    .filter((item) => n - item.respawnTs < TWO_DAYS)
     .sort((a, b) => {
       const aExpired = a.respawnTs <= n
       const bExpired = b.respawnTs <= n
