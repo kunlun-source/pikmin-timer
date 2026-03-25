@@ -54,16 +54,21 @@ function handleAdd() {
   rawInput.value = ''
 }
 
+// Sorting only re-runs when items change (add/delete), not every tick.
+// Respawned rows drop to bottom only when a new item triggers recompute.
+const orderedItems = computed(() => {
+  const snapshot = Date.now()
+  return [...items.value].sort((a, b) => {
+    const aExpired = a.respawnTs <= snapshot
+    const bExpired = b.respawnTs <= snapshot
+    if (aExpired !== bExpired) return aExpired ? 1 : -1
+    return a.respawnTs - b.respawnTs
+  })
+})
+
 const sortedItems = computed(() => {
   const n = now.value
-  return [...items.value]
-    .filter((item) => n - item.respawnTs < TWO_DAYS)
-    .sort((a, b) => {
-      const aExpired = a.respawnTs <= n
-      const bExpired = b.respawnTs <= n
-      if (aExpired !== bExpired) return aExpired ? 1 : -1
-      return a.respawnTs - b.respawnTs
-    })
+  return orderedItems.value.filter((item) => n - item.respawnTs < TWO_DAYS)
 })
 </script>
 

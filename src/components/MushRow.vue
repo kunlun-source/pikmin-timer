@@ -73,8 +73,12 @@ const isExpanding = computed(() => {
 }
 
 .mush-row.expanding td {
-  padding: 30px 12px;
-  font-size: 1.4em;
+  padding: 55px 12px;
+  font-size: 1.6em;
+}
+
+.mush-row.expanding {
+  outline: 2px solid #f5a623;
 }
 
 .mush-row.deleted td {
